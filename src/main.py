@@ -1,7 +1,16 @@
+from random import randint
 import pygame
 from setting import *
+from aleatorio import get_random_color,random_color
 
+#direciones
+DR = 3
+UR = 9
+DL = 1
+UL = 7   
 
+block_width = 100
+block_height = 100
 pygame.init()
 
 SCREEN = pygame.display.set_mode(SCREEN_SIZE)
@@ -9,12 +18,18 @@ pygame.display.set_caption("Primer Juego")
 
 clock = pygame.time.Clock()
 
-# rect_1 = pygame.Rect(300,250,200,100)
-rect_1 = pygame.Rect(WIDTH //2 - 100,HEIGHT // 2 - 50,200,100) #centrado rect
+#comienzo random
+blocks = [{"rect": pygame.Rect(randint(0,WIDTH -block_width),randint(0,WIDTH -block_width),block_width,block_height),"color": RED,"dir": DR, "borde": 0, "radio": -1},
+          {"rect": pygame.Rect(randint(0,WIDTH -block_width),randint(0,WIDTH -block_width),block_width,block_height),"color": GREEN,"dir": UL, "borde": 0 , "radio": -1},
+          {"rect": pygame.Rect(randint(0,WIDTH -block_width),randint(0,WIDTH -block_width),block_width,block_height),"color": BLUE,"dir": DL , "borde": 0, "radio": -1}]
+
+
 
 speed = 5
 
 flag = False
+flag_x = False
+
 contador = 0
 is_running = True
 
@@ -28,52 +43,61 @@ while is_running:
             is_running = False
 
     #actualizamos elemetos
-    # if rect_1.top <= HEIGHT:
+    for block in blocks:
+    #actualizamos direcion
+        if block["rect"].right >= WIDTH:
+            if block["dir"] == DR:
+                block["dir"] = DL
+            else:
+                block["dir"] = UL
+            block["color"] = get_random_color(colores)
 
-    #     rect_1.y  += speed
-    # else:
-    #     rect_1.bottom = 0
-
-    # if rect_1.top >= 0:
-    #     rect_1.y -= speed
-    if flag:
-        if rect_1.bottom <= HEIGHT:
-            rect_1.y  += speed
-        else:
-            flag = False
-    else:
-        if rect_1.top >= 0:
-            rect_1.y -= speed
-        else:
-            flag = True
+        elif block["rect"].left <= 0:
+            if block["dir"] == DL:
+                block["dir"] = DR
+            else:
+                block["dir"] = UR
+            block["color"] = random_color()
+            
+        elif block["rect"].bottom >= HEIGHT:
+            if block["dir"] == DR:
+                block["dir"] = UR
+            else:
+                block["dir"] = UL
+            block["borde"] = randint(0,10)
+        elif block["rect"].top <= 0:
+            if block["dir"] == UR:
+                block["dir"] = DR
+            else:
+                block["dir"] = DL
+            block["radio"] = randint(-1,20)
+        
+        #actualizamos movimiento
+        
+        if block["dir"] == DR:
+            block["rect"].x += speed
+            block["rect"].y += speed
+        elif block["dir"] == DL:
+            block["rect"].x -= speed
+            block["rect"].y += speed       
+        elif block["dir"] == UL:
+            block["rect"].x -= speed
+            block["rect"].y -= speed 
+        elif block["dir"] == UR:
+            block["rect"].x += speed
+            block["rect"].y -= speed 
+        
 
 
     #dibujamos pantalla
     SCREEN.fill(CUSTOM) 
-    pygame.draw.rect(SCREEN,RED,rect_1)
+    for block in blocks:
+        pygame.draw.rect(SCREEN,block["color"],block["rect"],block["borde"],block["radio"])
 
 
-
-    
 
     ##actualizamos elemetos
     pygame.display.flip()
 
 
 pygame.quit()
-
-    # rect_2 =pygame.draw.ellipse(SCREEN,RED,(0, 0, 200, 100))
-    # pygame.draw.rect(SCREEN,BLUE,rect_2,3)
-    # # rect_3 =pygame.draw.rect(SCREEN,BLUE,rect_1)
-
-    # pygame.draw.line(SCREEN,BLUE,(0,0),(WIDTH,HEIGHT))
-    
-    # rect_4 = pygame.draw.line(SCREEN,GREEN,rect_1.center,rect_2.center,3)
-    
-    # pygame.draw.rect(SCREEN,BLACK,rect_4,3)
-    
-    # rect_5= pygame.draw.polygon(SCREEN,WHITE,[(50,50),(500,100),(200,500)],3)
-    # pygame.draw.rect(SCREEN,WHITE,rect_5,3)
-
-    
-    # pygame.draw.circle(SCREEN,GREEN,SCREEN_CENTER,75,3)
