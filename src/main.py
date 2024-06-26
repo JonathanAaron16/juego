@@ -2,21 +2,12 @@ from random import randint, randrange
 import pygame
 from setting import *
 from aleatorio import get_random_color,random_color
+from colision import *
+from bloque import *
 
-#direciones
-DR = 3
-UR = 9
-DL = 1
-UL = 7   
 
-direcciones = (DR,UR,DL,UL)
 
-block_width = 100
-block_height = 100
-count_coins = 25
-
-width_coin = 20
-height_coin = 20
+cantidad_moneda = 25
 
 pygame.init()
 
@@ -24,57 +15,24 @@ SCREEN = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Primer Juego")
 
 clock = pygame.time.Clock()
-
-def dectetar_colision(rect1,rect2):
-    if punto_en_rect(rect1.topleft,rect2) or\
-        punto_en_rect(rect1.topright,rect2) or\
-        punto_en_rect(rect1.bottomleft,rect2) or\
-        punto_en_rect(rect1.bottomright,rect2) or\
-        punto_en_rect(rect2.topleft,rect1) or\
-        punto_en_rect(rect2.topright,rect1) or\
-        punto_en_rect(rect2.bottomleft,rect1) or\
-        punto_en_rect(rect2.bottomright,rect1):
-        return True
-    else:
-        return False
-
-def punto_en_rect(punto,rect):
-    x , y = punto
-    if x >= rect.left and x <= rect.right and y >= rect.top and y <= rect.bottom:
-        return True
-    else:
-        return False
-        
-
-def create_block(left = 0,top= 0,width= 50, height=50, color = (255,255,255 ),dire = 3,borde = 0,radio = -1):
-    return {"rect": pygame.Rect(left,top,width, height),"color": color,"dir": dire, "borde": borde, "radio": radio}
-          
-
-
-block = create_block(randint(0,WIDTH -block_width),randint(0,WIDTH -block_width),block_width,block_height,random_color(), direcciones[randrange(len(direcciones))])
-
+    
+#creo el player
+block = create_player()
+#creo lista monedas
 coins = []
-for i in range(count_coins):
-    coins.append(create_block(randint(0,WIDTH -width_coin),randint(0,HEIGHT -height_coin),width_coin,height_coin,YELLOW,0,0,height_coin // 2))
+#cargo la lista con 10 monedas
+load_coin_list(coins,cantidad_moneda)
 
-#comienzo random
-# blocks = [{"rect": pygame.Rect(randint(0,WIDTH -block_width),randint(0,WIDTH -block_width),block_width,block_height),"color": GREEN,"dir": UL, "borde": 0 , "radio": -1},
-#           {"rect": pygame.Rect(randint(0,WIDTH -block_width),randint(0,WIDTH -block_width),block_width,block_height),"color": BLUE,"dir": DL , "borde": 0, "radio": -1}]
+#configuro fuente de texto
+font = pygame.font.SysFont('Arial', 30)
 
+text = font.render(f"Score: {len(coins)}", True, RED)
 
-
-speed = 5
-
-flag = False
-flag_x = False
-
-contador = 0
 is_running = True
 
 while is_running:
     clock.tick(FPS)
-    # print(contador)
-    contador += 1
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -108,26 +66,26 @@ while is_running:
             block["dir"] = DR
         else:
             block["dir"] = DL
-        block["radio"] = randint(-1,20)
+        # block["radio"] = randint(-1,20)
     
         #actualizamos movimiento
   
         
     if block["dir"] == DR:
-        block["rect"].x += speed
-        block["rect"].y += speed
+        block["rect"].x += SPEED
+        block["rect"].y += SPEED
     elif block["dir"] == DL:
-        block["rect"].x -= speed
-        block["rect"].y += speed       
+        block["rect"].x -= SPEED
+        block["rect"].y += SPEED       
     elif block["dir"] == UL:
-        block["rect"].x -= speed
-        block["rect"].y -= speed 
+        block["rect"].x -= SPEED
+        block["rect"].y -= SPEED 
     elif block["dir"] == UR:
-        block["rect"].x += speed
-        block["rect"].y -= speed 
+        block["rect"].x += SPEED
+        block["rect"].y -= SPEED 
 
     for coin in coins[:]:   
-        if dectetar_colision(coin["rect"],block["rect"]):
+        if detectar_colision(coin["rect"],block["rect"]):
             coins.remove(coin)
 
     #dibujamos pantalla
@@ -138,7 +96,7 @@ while is_running:
     for coin in coins:
         pygame.draw.rect(SCREEN,coin["color"],coin["rect"],coin["borde"],coin["radio"])
 
-
+    SCREEN.blit(text, (0,0))
 
 
     ##actualizamos elemetos

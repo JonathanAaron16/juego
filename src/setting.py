@@ -12,4 +12,12 @@ WHITE = (255,255,255)
 CUSTOM = (50,173,220)
 FPS=60
 
+SPEED = 5
 colores = [RED,GREEN,YELLOW,BLUE,BLACK,WHITE]
+#direciones
+DR = 3
+UR = 9
+DL = 1
+UL = 7   
+
+direcciones = (DR,UR,DL,UL)
